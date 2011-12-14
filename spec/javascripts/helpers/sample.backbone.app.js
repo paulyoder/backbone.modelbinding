@@ -45,6 +45,8 @@ AView = Backbone.View.extend({
       <input type='radio' id='graduated_maybe' name='graduated' value='maybe'>\
       <input type='radio' id='us_citizen_true' name='us_citizen' value='true'>\
       <input type='radio' id='us_citizen_false' name='us_citizen' value='false'>\
+      <input type='radio' id='industry_commerce' name='industry' value='commerce'>\
+      <input type='radio' id='industry_audio_visual' name='industry' value='audio/visual'>\
       <input type='radio' id='another_radio_true' name='another_radio' value='true' checked='checked'>\
       <input type='radio' id='another_radio_false' name='another_radio' value='false'>\
       <input type='checkbox' id='drivers_license' value='yes'>\

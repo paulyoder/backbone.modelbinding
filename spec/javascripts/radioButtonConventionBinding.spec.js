@@ -2,7 +2,8 @@ describe("radio button convention binding", function(){
   beforeEach(function(){
     this.model = new AModel({
       graduated: "maybe",
-      us_citizen: false
+      us_citizen: false,
+      industry: "commerce"
     });
     this.view = new AView({model: this.model});
     this.view.render();
@@ -18,6 +19,14 @@ describe("radio button convention binding", function(){
   it("bind model field changes to the form input, by convention of id", function(){
     this.model.set({graduated: "yes"});
     var el = this.view.$("#graduated_yes");
+    var selected = el.attr("checked");
+
+    expect(selected).toBeTruthy();
+  });
+
+  it("bind model field changes to the form input, by convention of id, with / in value", function(){
+    this.model.set({industry: 'audio/visual'});
+    var el = this.view.$("#industry_audio_visual");
     var selected = el.attr("checked");
 
     expect(selected).toBeTruthy();
