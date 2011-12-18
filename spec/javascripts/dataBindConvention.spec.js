@@ -136,4 +136,20 @@ describe("data-bind conventions", function(){
       expect(this.el).toBeHidden();
     });
   });
+
+  describe("when a data-bind is configured with a formatter", function(){
+    beforeEach(function(){
+      this.view.render();
+      this.el = this.view.$("#doctor_formatter");
+    });
+
+    it("should format the model's property value immediately", function(){
+      expect(this.el.html()).toBe("Dr. Seuss");
+    });
+
+    it("should format the model's property value when changed", function(){
+      this.model.set({doctor: "No"});
+      expect(this.el.html()).toBe("Dr. No");
+    });
+  });
 });

@@ -13,6 +13,7 @@ AView = Backbone.View.extend({
       <div id='doctor_no_elem' data-bind='doctor'>Seuss</div>\
       <div id='doctor_data_bind_bb' data-bind-bb='doctor'>Seuss</div>\
       <div id='doctor' data-bind='text doctor'>Seuss</div>\
+      <div id='doctor_formatter' data-bind='fn:doctorFormatter doctor'>Seuss</div>\
       <div id='pet' data-bind='someAttr pet' someAttr='Cat'></div>\
       <input type='text' id='super_hero_weakness' modelAttr='weakness'>\
       <input type='text' id='something'> \
@@ -63,6 +64,12 @@ AView = Backbone.View.extend({
       ");
     this.$(this.el).append(html);
     Backbone.ModelBinding.bind(this);
+  },
+  initialize: function(){
+    _.bindAll(this, 'doctorFormatter');
+  },
+  doctorFormatter: function(value, element, model, view){
+    return 'Dr. ' + value;
   }
 });
 

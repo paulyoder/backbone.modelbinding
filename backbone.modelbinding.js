@@ -441,14 +441,21 @@ Backbone.ModelBinding = (function(Backbone, _, $){
       var dataBindAttributeName = modelBinding.Conventions.databind.selector.replace(/^(.*\[)([^\]]*)(].*)/g, '$2');
       var databindList = element.attr(dataBindAttributeName).split(";");
       _.each(databindList, function(attrbind){
-        var databind = $.trim(attrbind).split(" ");
+        var formatter = undefined;
+        var formatterMatch = attrbind.match(/fn:[^ ]+/);
+        if (formatterMatch){
+          formatter = formatterMatch[0].replace("fn:", "");
+        }
+
+        var databind = $.trim(attrbind.replace(/fn:[^ ]+/, "")).split(" ");
 
         // make the default special case "text" if none specified
         if( databind.length == 1 ) databind.unshift("text");
 
         dataBindConfigList.push({
           elementAttr: databind[0],
-          modelAttr: databind[1]
+          modelAttr: databind[1],
+          formatter: formatter
         });
       });
       return dataBindConfigList;
@@ -465,13 +472,20 @@ Backbone.ModelBinding = (function(Backbone, _, $){
 
         _.each(databindList, function(databind){
           var modelChange = function(model, val){
+            if (databind.formatter){
+              val = view[databind.formatter](val);
+            }
             setOnElement(element, databind.elementAttr, val);
           };
 
           modelBinder.registerModelBinding(model, databind.modelAttr, modelChange);
 
           // set default on data-bind element
-          setOnElement(element, databind.elementAttr, model.get(databind.modelAttr));
+          var modelVal = model.get(databind.modelAttr);
+          if (databind.formatter){
+            modelVal = view[databind.formatter](modelVal);
+          }
+          setOnElement(element, databind.elementAttr, modelVal);
         });
 
       });
