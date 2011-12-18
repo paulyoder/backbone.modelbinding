@@ -473,7 +473,11 @@ Backbone.ModelBinding = (function(Backbone, _, $){
         _.each(databindList, function(databind){
           var modelChange = function(model, val){
             if (databind.formatter){
-              val = view[databind.formatter](val);
+              if (view[databind.formatter] !== undefined){
+                val = view[databind.formatter](val);
+              }else{
+                val = ''; //this.[databind.formatter](val);
+              }
             }
             setOnElement(element, databind.elementAttr, val);
           };
@@ -483,7 +487,11 @@ Backbone.ModelBinding = (function(Backbone, _, $){
           // set default on data-bind element
           var modelVal = model.get(databind.modelAttr);
           if (databind.formatter){
-            modelVal = view[databind.formatter](modelVal);
+            if (view[databind.formatter] !== undefined){
+              modelVal = view[databind.formatter](modelVal);
+            }else{
+              modelVal = '';//[databind.formatter](modelVal);
+            }
           }
           setOnElement(element, databind.elementAttr, modelVal);
         });
