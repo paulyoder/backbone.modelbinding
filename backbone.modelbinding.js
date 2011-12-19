@@ -440,28 +440,33 @@ Backbone.ModelBinding = (function(Backbone, _, $){
       var parseFormatter = function(attrbind){
         var parseFunctionName = function(functionName)
         {
-          if (_.isFunction(view[functionName])){
-            return view[functionName];
+          var namespaces = functionName.split(".");
+          var func = namespaces.pop();
+
+          //first see if the function is on the view
+          var context = view;
+          _.each(namespaces, function(namespace){
+            if (context[namespace] !== undefined){
+              context = context[namespace];
+            }
+          });
+          if (context[func] !== undefined && _.isFunction(context[func])){
+            return context[func];
           } 
 
-          var namespaces = functionName.split(".");
-          if (namespaces.length === 1){
-            //global function without namespace
-            //can't figure out how to call it without using eval()
-            return eval(functionName);
-          }
-
-          var func = namespaces.pop();
-          var context = this;
+          //then see if the function is on the global window object
+          context = window;
           _.each(namespaces, function(namespace){
-            context = context[namespace];
+            if (context[namespace] !== undefined){
+              context = context[namespace];
+            }
           });
-
-          if (_.isFunction(context[func])){
+          if (context[func] !== undefined && _.isFunction(context[func])){
             return context[func];
-          }
+          } 
 
-          return null;
+          var errorMessage = "Formatter function (" + functionName + ") is not defined on the view or global window object";
+          throw errorMessage;
         }
 
         var formatter = function(val) { return val; };

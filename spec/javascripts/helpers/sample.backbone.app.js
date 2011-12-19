@@ -14,6 +14,7 @@ AView = Backbone.View.extend({
       <div id='doctor_data_bind_bb' data-bind-bb='doctor'>Seuss</div>\
       <div id='doctor' data-bind='text doctor'>Seuss</div>\
       <div id='doctor_formatter' data-bind='fn:doctorFormatter doctor'>Seuss</div>\
+      <div id='doctor_duplicate_formatter' data-bind='fn:formatters.titleFormatter doctor'>Seuss</div>\
       <div id='doctor_global_formatter' data-bind='fn:toUpperCaseFormatter doctor'>Seuss</div>\
       <div id='doctor_namespace_formatter' data-bind='fn:formatters.toLowerCaseFormatter doctor'>Seuss</div>\
       <div id='doctor_no_return_formatter' data-bind='fn:noReturnFormatter doctor'>Seuss</div>\
@@ -72,9 +73,17 @@ AView = Backbone.View.extend({
     return 'Dr. ' + value;
   },
   noReturnFormatter: function(value, element, model, view){
-    if (value === undefined || value === null) { return; }
-    element.height(value.length);
-    $(view.el).attr('something', model.get('doctor').length);  
+    if (value){ 
+      element.height(value.length);
+      $(view.el).attr('something', model.get('doctor').length);  
+    }
+  },
+  formatters: {
+    titleFormatter: function(value, element, model, view) {
+      if (value){
+        return "Mr. " + value;
+      }
+    }
   }
 });
 
@@ -155,13 +164,21 @@ AnotherView = Backbone.View.extend({
 });
 
 toUpperCaseFormatter = function(value, element, model, view) {
-  if (value === undefined || value === null) { return; }
-  return value.toUpperCase();
+  if (value){
+    return value.toUpperCase();
+  }
 };
 
-formatters = {};
-formatters.toLowerCaseFormatter = function(value, element, model, view) {
-  if (value === undefined || value === null) { return; }
-  return value.toLowerCase();
-};
 
+formatters = {
+  toLowerCaseFormatter: function(value, element, model, view) {
+    if (value){
+      return value.toLowerCase();
+    }
+  },
+  titleFormatter: function(value, element, model, view) {
+    if (value){
+      return "Mister " + value;
+    }
+  }
+};
