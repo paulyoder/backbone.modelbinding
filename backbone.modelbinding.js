@@ -464,7 +464,7 @@ Backbone.ModelBinding = (function(Backbone, _, $){
           return null;
         }
 
-        var formatter = null;
+        var formatter = function(val) { return val; };
         var formatterMatch = attrbind.match(/fn:[^ ]+/);
         if (formatterMatch){
           var functionName = formatterMatch[0].replace("fn:", "");
@@ -512,27 +512,15 @@ Backbone.ModelBinding = (function(Backbone, _, $){
 
         _.each(databindList, function(databind){
           var modelChange = function(model, val){
-            if (databind.formatter){
-              val = databind.formatter(val, element, model, view);
-              if (val){
-                setOnElement(element, databind.elementAttr, val);
-              }
-            }else{
-              setOnElement(element, databind.elementAttr, val);
-            }
+            val = databind.formatter(val, element, model, view);
+            setOnElement(element, databind.elementAttr, val);
           };
 
           modelBinder.registerModelBinding(model, databind.modelAttr, modelChange);
 
           var initialValue = model.get(databind.modelAttr);
-          if (databind.formatter){
-            var formattedValue = databind.formatter(initialValue, element, model, view);
-            if (formattedValue){
-              setOnElement(element, databind.elementAttr, formattedValue);
-            }
-          }else{
-            setOnElement(element, databind.elementAttr, initialValue);
-          }
+	  var formattedValue = databind.formatter(initialValue, element, model, view);
+          setOnElement(element, databind.elementAttr, formattedValue);
         });
 
       });
