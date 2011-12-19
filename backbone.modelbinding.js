@@ -519,7 +519,7 @@ Backbone.ModelBinding = (function(Backbone, _, $){
           modelBinder.registerModelBinding(model, databind.modelAttr, modelChange);
 
           var initialValue = model.get(databind.modelAttr);
-	  var formattedValue = databind.formatter(initialValue, element, model, view);
+          var formattedValue = databind.formatter(initialValue, element, model, view);
           setOnElement(element, databind.elementAttr, formattedValue);
         });
 
