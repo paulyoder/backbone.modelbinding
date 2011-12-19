@@ -435,16 +435,21 @@ Backbone.ModelBinding = (function(Backbone, _, $){
       }
     };
 
-    splitBindingAttr = function(element)
+    splitBindingAttr = function(element, view)
     {
       var dataBindConfigList = [];
       var dataBindAttributeName = modelBinding.Conventions.databind.selector.replace(/^(.*\[)([^\]]*)(].*)/g, '$2');
       var databindList = element.attr(dataBindAttributeName).split(";");
       _.each(databindList, function(attrbind){
-        var formatter = undefined;
+        var formatter = null;
         var formatterMatch = attrbind.match(/fn:[^ ]+/);
         if (formatterMatch){
-          formatter = formatterMatch[0].replace("fn:", "");
+          var functionName = formatterMatch[0].replace("fn:", "");
+          if (_.isFunction(view[functionName])){
+            formatter = view[functionName];
+          } else if (_.isFunction(this[functionName])){
+            //formatter = this[functionName];
+          }
         }
 
         var databind = $.trim(attrbind.replace(/fn:[^ ]+/, "")).split(" ");
@@ -468,32 +473,31 @@ Backbone.ModelBinding = (function(Backbone, _, $){
 
       view.$(selector).each(function(index){
         var element = view.$(this);
-        var databindList = splitBindingAttr(element);
+        var databindList = splitBindingAttr(element, view);
 
         _.each(databindList, function(databind){
           var modelChange = function(model, val){
             if (databind.formatter){
-              if (view[databind.formatter] !== undefined){
-                val = view[databind.formatter](val);
-              }else{
-                val = ''; //this.[databind.formatter](val);
+              val = databind.formatter(val, element, model, view);
+              if (val){
+                setOnElement(element, databind.elementAttr, val);
               }
+            }else{
+              setOnElement(element, databind.elementAttr, val);
             }
-            setOnElement(element, databind.elementAttr, val);
           };
 
           modelBinder.registerModelBinding(model, databind.modelAttr, modelChange);
 
-          // set default on data-bind element
-          var modelVal = model.get(databind.modelAttr);
+          var initialValue = model.get(databind.modelAttr);
           if (databind.formatter){
-            if (view[databind.formatter] !== undefined){
-              modelVal = view[databind.formatter](modelVal);
-            }else{
-              modelVal = '';//[databind.formatter](modelVal);
+            var formattedValue = databind.formatter(initialValue, element, model, view);
+            if (formattedValue){
+              setOnElement(element, databind.elementAttr, formattedValue);
             }
+          }else{
+            setOnElement(element, databind.elementAttr, initialValue);
           }
-          setOnElement(element, databind.elementAttr, modelVal);
         });
 
       });

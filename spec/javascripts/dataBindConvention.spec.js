@@ -138,7 +138,7 @@ describe("data-bind conventions", function(){
   });
 
   describe("when a data-bind is configured with a formatter", function(){
-    describe("when the formatter is a property on the view", function(){
+    describe("when the formatter is a property on the view and returns a value", function(){
       beforeEach(function(){
         this.view.render();
         this.el = this.view.$("#doctor_formatter");
@@ -151,6 +151,24 @@ describe("data-bind conventions", function(){
       it("should format the model's property value when changed", function(){
         this.model.set({doctor: "No"});
         expect(this.el.html()).toBe("Dr. No");
+      });
+    });
+
+    describe("when the formatter is a property on the view and doesn't return a value", function(){
+      beforeEach(function(){
+        this.view.render();
+        this.el = this.view.$("#doctor_no_return_formatter");
+      });
+
+      it("should format the model's property value immediately", function(){
+        expect(this.el.height()).toBe("Seuss".length);
+        expect($(this.view.el).attr("something")).toBe("Seuss".length.toString());
+      });
+
+      it("should format the model's property value when changed", function(){
+        this.model.set({doctor: "No"});
+        expect(this.el.height()).toBe("No".length);
+        expect($(this.view.el).attr("something")).toBe("No".length.toString());
       });
     });
 
@@ -170,7 +188,7 @@ describe("data-bind conventions", function(){
       });
     });
 
-    describe("when the formatter is a namespaced function", function(){
+    describe("when the formatter is a global namespaced function", function(){
       beforeEach(function(){
         this.view.render();
         this.el = this.view.$("#doctor_namespace_formatter");
