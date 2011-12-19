@@ -435,52 +435,67 @@ Backbone.ModelBinding = (function(Backbone, _, $){
       }
     };
 
-    parseFunctionName = function(functionName, view)
+    var splitBindingAttr = function(element, view)
     {
-      if (_.isFunction(view[functionName])){
-        return view[functionName];
-      } 
+      var parseFormatter = function(attrbind){
+        var parseFunctionName = function(functionName)
+        {
+          if (_.isFunction(view[functionName])){
+            return view[functionName];
+          } 
 
-      var namespaces = functionName.split(".");
-      if (namespaces.length === 1){
-        return eval(functionName);
-      }
+          var namespaces = functionName.split(".");
+          if (namespaces.length === 1){
+            //global function without namespace
+            //can't figure out how to call it without using eval()
+            return eval(functionName);
+          }
 
-      var func = namespaces.pop();
-      var context = this;
-      _.each(namespaces, function(namespace){
-        context = context[namespace];
-      });
+          var func = namespaces.pop();
+          var context = this;
+          _.each(namespaces, function(namespace){
+            context = context[namespace];
+          });
 
-      if (_.isFunction(context[func])){
-        return context[func];
-      }
+          if (_.isFunction(context[func])){
+            return context[func];
+          }
 
-      return null;
-    }
+          return null;
+        }
 
-    splitBindingAttr = function(element, view)
-    {
-      var dataBindConfigList = [];
-      var dataBindAttributeName = modelBinding.Conventions.databind.selector.replace(/^(.*\[)([^\]]*)(].*)/g, '$2');
-      var databindList = element.attr(dataBindAttributeName).split(";");
-      _.each(databindList, function(attrbind){
         var formatter = null;
         var formatterMatch = attrbind.match(/fn:[^ ]+/);
         if (formatterMatch){
           var functionName = formatterMatch[0].replace("fn:", "");
-          formatter = parseFunctionName(functionName, view);
+          formatter = parseFunctionName(functionName);
         }
+        return formatter;
+      };
 
-        var databind = $.trim(attrbind.replace(/fn:[^ ]+/, "")).split(" ");
+      var parseTextValues = function(attrbind){
+        return $.trim(attrbind.replace(/[^ ]*:[^ ]+/, "")).split(" ");
+      };
 
+      var parseElementAttr = function(attrbind){
+        var textValues = parseTextValues(attrbind);
         // make the default special case "text" if none specified
-        if( databind.length == 1 ) databind.unshift("text");
+        return (textValues.length === 1) ?  "text" : textValues[0];
+      };
 
+      var parseModelAttr = function(attrbind){
+        var textValues = parseTextValues(attrbind);
+        return textValues.pop();
+      };
+
+      var dataBindConfigList = [];
+      var dataBindAttributeName = modelBinding.Conventions.databind.selector.replace(/^(.*\[)([^\]]*)(].*)/g, '$2');
+      var databindList = element.attr(dataBindAttributeName).split(";");
+      _.each(databindList, function(attrbind){
         dataBindConfigList.push({
-          elementAttr: databind[0],
-          modelAttr: databind[1],
-          formatter: formatter
+          elementAttr: parseElementAttr(attrbind),
+          modelAttr: parseModelAttr(attrbind),
+          formatter: parseFormatter(attrbind)
         });
       });
       return dataBindConfigList;
