@@ -435,6 +435,30 @@ Backbone.ModelBinding = (function(Backbone, _, $){
       }
     };
 
+    parseFunctionName = function(functionName, view)
+    {
+      if (_.isFunction(view[functionName])){
+        return view[functionName];
+      } 
+
+      var namespaces = functionName.split(".");
+      if (namespaces.length === 1){
+        return eval(functionName);
+      }
+
+      var func = namespaces.pop();
+      var context = this;
+      _.each(namespaces, function(namespace){
+        context = context[namespace];
+      });
+
+      if (_.isFunction(context[func])){
+        return context[func];
+      }
+
+      return null;
+    }
+
     splitBindingAttr = function(element, view)
     {
       var dataBindConfigList = [];
@@ -445,11 +469,7 @@ Backbone.ModelBinding = (function(Backbone, _, $){
         var formatterMatch = attrbind.match(/fn:[^ ]+/);
         if (formatterMatch){
           var functionName = formatterMatch[0].replace("fn:", "");
-          if (_.isFunction(view[functionName])){
-            formatter = view[functionName];
-          } else if (_.isFunction(this[functionName])){
-            //formatter = this[functionName];
-          }
+          formatter = parseFunctionName(functionName, view);
         }
 
         var databind = $.trim(attrbind.replace(/fn:[^ ]+/, "")).split(" ");

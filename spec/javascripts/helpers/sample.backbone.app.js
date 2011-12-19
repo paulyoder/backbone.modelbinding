@@ -14,8 +14,8 @@ AView = Backbone.View.extend({
       <div id='doctor_data_bind_bb' data-bind-bb='doctor'>Seuss</div>\
       <div id='doctor' data-bind='text doctor'>Seuss</div>\
       <div id='doctor_formatter' data-bind='fn:doctorFormatter doctor'>Seuss</div>\
-      <div id='doctor_global_formatter' data-bind='fn:toUpperFormatter doctor'>Seuss</div>\
-      <div id='doctor_namespace_formatter' data-bind2='fn:formatters.toLowerCaseFormatter doctor'>Seuss</div>\
+      <div id='doctor_global_formatter' data-bind='fn:toUpperCaseFormatter doctor'>Seuss</div>\
+      <div id='doctor_namespace_formatter' data-bind='fn:formatters.toLowerCaseFormatter doctor'>Seuss</div>\
       <div id='doctor_no_return_formatter' data-bind='fn:noReturnFormatter doctor'>Seuss</div>\
       <div id='pet' data-bind='someAttr pet' someAttr='Cat'></div>\
       <input type='text' id='super_hero_weakness' modelAttr='weakness'>\
@@ -154,12 +154,14 @@ AnotherView = Backbone.View.extend({
   }
 });
 
-toUpperFormatter = function(value, element, model, view) {
+toUpperCaseFormatter = function(value, element, model, view) {
+  if (value === undefined || value === null) { return; }
   return value.toUpperCase();
 };
 
 formatters = {};
 formatters.toLowerCaseFormatter = function(value, element, model, view) {
+  if (value === undefined || value === null) { return; }
   return value.toLowerCase();
 };
 
